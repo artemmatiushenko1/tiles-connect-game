@@ -1,0 +1,45 @@
+.tile {
+  background-color: transparent;
+  perspective: 1000px;
+}
+
+.tile-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+
+.tile.tile--active .tile-inner {
+  transform: rotateY(180deg);
+}
+
+.tile-front,
+.tile-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 35px;
+  border-radius: 5px;
+}
+
+.tile-front {
+  background-color: #bbb;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.tile-front:hover {
+  background-color: rgb(150, 150, 150);
+}
+
+.tile-back {
+  background-color: yellowgreen;
+  transform: rotateY(180deg);
+}

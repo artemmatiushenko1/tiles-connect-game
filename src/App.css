@@ -4,11 +4,3 @@
   justify-content: center;
   height: 100%;
 }
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(6, 1fr);
-  width: 500px;
-  height: 600px;
-}
