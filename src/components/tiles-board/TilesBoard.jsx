@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { TILE_STATE, TILES_GRID_SIZE, CLOSE_TILE_DELAY } from '../../constants';
-import Tile from '../tile/Tile';
+import Tile from '../tile/Tile.jsx';
 import './TilesBoard.css';
 import createEmptyMatrix from '../../utils/createEmptyMatrix';
 import generateTilesGrid from '../../utils/generateTilesGrid';
@@ -44,6 +44,7 @@ const TilesBoard = () => {
 
   const handleTilesDifferent = (firstCardCords, secondCardCords) => {
     setIsAbleToClick(false);
+
     setTimeout(() => {
       setTilesState((prevState) => {
         const newState = [...prevState];
@@ -66,12 +67,12 @@ const TilesBoard = () => {
       {tilesGrid.map((row, i) => {
         return row.map((col, j) => (
           <Tile
-            visible={tilesState[i][j] === TILE_STATE.OPENED}
+            x={i}
+            y={j}
             key={`${i}-${j}`}
             icon={tilesGrid[i][j]}
             onClick={onTileClickHandler}
-            x={i}
-            y={j}
+            visible={tilesState[i][j] === TILE_STATE.OPENED}
           />
         ));
       })}
