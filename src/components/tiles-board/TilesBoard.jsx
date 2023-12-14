@@ -1,9 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
-import { TILE_STATE, TILES_GRID_SIZE, CLOSE_TILE_DELAY } from '../../constants';
+import {
+  TILE_STATE,
+  TILES_GRID_SIZE,
+  CLOSE_TILE_DELAY,
+} from '../../constants.js';
 import Tile from '../tile/Tile.jsx';
 import './TilesBoard.css';
-import createEmptyMatrix from '../../utils/createEmptyMatrix';
-import generateTilesGrid from '../../utils/generateTilesGrid';
+import createEmptyMatrix from '../../utils/createEmptyMatrix.js';
+import generateTilesGrid from '../../utils/generateTilesGrid.js';
 
 const TilesBoard = () => {
   const tilesGrid = useMemo(() => generateTilesGrid(), []);
