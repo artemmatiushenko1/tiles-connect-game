@@ -1,36 +1,83 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   TILE_STATE,
   TILES_GRID_SIZE,
   CLOSE_TILE_DELAY,
+  BASE_SCORE_MULTIPLER,
+  BASE_SCORE,
+  MAX_TILES_TO_REVEAL,
+  GameAppEvent,
 } from '../../constants.js';
 import Tile from '../tile/Tile.jsx';
-import './TilesBoard.css';
 import createEmptyMatrix from '../../utils/createEmptyMatrix.js';
 import generateTilesGrid from '../../utils/generateTilesGrid.js';
+import './TilesBoard.css';
+import shouldEndGame from '../../utils/shouldEndGame.js';
 
 const TilesBoard = () => {
-  const tilesGrid = useMemo(() => generateTilesGrid(), []);
+  const [tilesGrid, setTilesGrid] = useState(generateTilesGrid);
   const [activeTiles, setActiveTiles] = useState([]);
   const [tilesState, setTilesState] = useState(createEmptyMatrix);
   const [isAbleToClick, setIsAbleToClick] = useState(true);
+  const [score, setScore] = useState(0);
+  const [scoreMultiplier, setScoreMultiplier] = useState(BASE_SCORE_MULTIPLER);
 
   useEffect(() => {
-    if (activeTiles.length === 2) {
+    if (activeTiles.length === MAX_TILES_TO_REVEAL) {
       const [firstCardProps, secondCardProps] = activeTiles;
       const { value: firstTileValue, cords: firstTileCords } = firstCardProps;
       const { value: secondTileValue, cords: secondTileCords } =
         secondCardProps;
 
       if (firstTileValue !== secondTileValue) {
+        setScoreMultiplier(BASE_SCORE_MULTIPLER);
         handleTilesDifferent(firstTileCords, secondTileCords);
+      } else {
+        setScore((prevScore) => prevScore + BASE_SCORE * scoreMultiplier);
+        setScoreMultiplier(
+          (prevMultiplier) => prevMultiplier + BASE_SCORE_MULTIPLER
+        );
       }
 
       setActiveTiles([]);
     }
   }, [activeTiles]);
 
-  const onTileClickHandler = (x, y) => {
+  useEffect(() => {
+    const scoreUpdateEvent = new CustomEvent(GameAppEvent.SCORE_UPDATE, {
+      detail: { score },
+    });
+
+    window.dispatchEvent(scoreUpdateEvent);
+  }, [score]);
+
+  useEffect(() => {
+    const handleRestart = () => {
+      setScore(0);
+      setActiveTiles([]);
+      setTilesGrid(generateTilesGrid());
+      setTilesState(createEmptyMatrix());
+      setScoreMultiplier(BASE_SCORE_MULTIPLER);
+    };
+
+    window.addEventListener(GameAppEvent.RESTART, handleRestart);
+
+    return () => {
+      window.removeEventListener(GameAppEvent.RESTART, handleRestart);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (shouldEndGame(tilesState)) {
+      const endGameEvent = new CustomEvent(GameAppEvent.END, {
+        detail: { score },
+      });
+
+      window.dispatchEvent(endGameEvent);
+    }
+  }, [tilesState]);
+
+  const handleTileClick = (x, y) => {
     if (tilesState[x][y] === TILE_STATE.OPENED || !isAbleToClick) return;
 
     setTilesState((prevState) => {
@@ -39,7 +86,7 @@ const TilesBoard = () => {
       return newState;
     });
 
-    if (activeTiles.length === 0 || activeTiles.length === 1) {
+    if (activeTiles.length < MAX_TILES_TO_REVEAL) {
       setActiveTiles((prevState) => {
         return [...prevState, { cords: { x, y }, value: tilesGrid[x][y] }];
       });
@@ -64,8 +111,8 @@ const TilesBoard = () => {
     <div
       className="grid"
       style={{
-        gridTemplateColumns: `repeat(${TILES_GRID_SIZE.COLS}, 1fr)`,
-        gridTemplateRows: `repeat(${TILES_GRID_SIZE.ROWS}, 1fr)`,
+        gridTemplateColumns: `repeat(${TILES_GRID_SIZE.COLS}, 90px)`,
+        gridTemplateRows: `repeat(${TILES_GRID_SIZE.ROWS}, 90px)`,
       }}
     >
       {tilesGrid.map((row, i) => {
@@ -73,9 +120,9 @@ const TilesBoard = () => {
           <Tile
             x={i}
             y={j}
+            icon={col}
             key={`${i}-${j}`}
-            icon={tilesGrid[i][j]}
-            onClick={onTileClickHandler}
+            onClick={handleTileClick}
             visible={tilesState[i][j] === TILE_STATE.OPENED}
           />
         ));
