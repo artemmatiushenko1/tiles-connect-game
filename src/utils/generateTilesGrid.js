@@ -1,4 +1,4 @@
-import { TILES_GRID_SIZE, ICONS } from '../constants';
+import { TILES_GRID_SIZE, ICONS, MAX_TILES_TO_REVEAL } from '../constants';
 
 const generateTilesGrid = (
   rows = TILES_GRID_SIZE.ROWS,
@@ -6,7 +6,11 @@ const generateTilesGrid = (
   icons = ICONS
 ) => {
   const grid = [];
-  const elements = [...icons, ...icons].sort(() => Math.random() - 0.5);
+  const targetIconsCount = (rows * cols) / MAX_TILES_TO_REVEAL;
+  const iconsSlice = icons.slice(0, targetIconsCount);
+  const elements = [...iconsSlice, ...iconsSlice].sort(
+    () => Math.random() - 0.5
+  );
 
   for (let i = 0; i < rows; i++) {
     const row = elements.splice(0, cols);
