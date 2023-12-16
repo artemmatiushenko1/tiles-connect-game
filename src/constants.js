@@ -4,8 +4,8 @@ export const TILE_STATE = {
 };
 
 export const TILES_GRID_SIZE = {
-  ROWS: 2,
-  COLS: 2,
+  ROWS: 5,
+  COLS: 6,
 };
 
 export const MAX_TILES_TO_REVEAL = 2;
