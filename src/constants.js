@@ -8,12 +8,6 @@ export const TILES_GRID_SIZE = {
   COLS: 2,
 };
 
-export const GameAppEvent = {
-  SCORE_UPDATE: 'score_update',
-  RESTART: 'restart',
-  END: 'end',
-};
-
 export const MAX_TILES_TO_REVEAL = 2;
 
 export const BASE_SCORE_MULTIPLER = 1;

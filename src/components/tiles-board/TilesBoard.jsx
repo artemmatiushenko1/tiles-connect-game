@@ -6,15 +6,14 @@ import {
   BASE_SCORE_MULTIPLER,
   BASE_SCORE,
   MAX_TILES_TO_REVEAL,
-  GameAppEvent,
 } from '../../constants.js';
 import Tile from '../tile/Tile.jsx';
 import createEmptyMatrix from '../../utils/createEmptyMatrix.js';
 import generateTilesGrid from '../../utils/generateTilesGrid.js';
-import './TilesBoard.css';
 import shouldEndGame from '../../utils/shouldEndGame.js';
+import './TilesBoard.css';
 
-const TilesBoard = () => {
+const TilesBoard = ({ gameAppEventService }) => {
   const [tilesGrid, setTilesGrid] = useState(generateTilesGrid);
   const [activeTiles, setActiveTiles] = useState([]);
   const [tilesState, setTilesState] = useState(createEmptyMatrix);
@@ -44,11 +43,9 @@ const TilesBoard = () => {
   }, [activeTiles]);
 
   useEffect(() => {
-    const scoreUpdateEvent = new CustomEvent(GameAppEvent.SCORE_UPDATE, {
+    gameAppEventService?.fire(gameAppEventService.GameAppEvent.SCORE_UPDATE, {
       detail: { score },
     });
-
-    window.dispatchEvent(scoreUpdateEvent);
   }, [score]);
 
   useEffect(() => {
@@ -60,20 +57,22 @@ const TilesBoard = () => {
       setScoreMultiplier(BASE_SCORE_MULTIPLER);
     };
 
-    window.addEventListener(GameAppEvent.RESTART, handleRestart);
+    gameAppEventService?.subscribe(
+      gameAppEventService.GameAppEvent.RESTART,
+      handleRestart
+    );
 
     return () => {
-      window.removeEventListener(GameAppEvent.RESTART, handleRestart);
+      gameAppEventService?.unsubscribe(
+        gameAppEventService.GameAppEvent.RESTART,
+        handleRestart
+      );
     };
   }, []);
 
   useEffect(() => {
     if (shouldEndGame(tilesState)) {
-      const endGameEvent = new CustomEvent(GameAppEvent.END, {
-        detail: { score },
-      });
-
-      window.dispatchEvent(endGameEvent);
+      gameAppEventService?.fire(gameAppEventService.GameAppEvent.END);
     }
   }, [tilesState]);
 
